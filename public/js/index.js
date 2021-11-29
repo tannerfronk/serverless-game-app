@@ -3,7 +3,7 @@
     let searchBtn = document.querySelector('#gameSearchBtn')
     let accessToken // initialize but don't assign until it has been generated
 
-    function getAccessToken() {
+    function generateAccessToken() {
         fetch('/.netlify/functions/generateToken')
             .then(res => res.json())
             .then(data => {
@@ -11,15 +11,19 @@
             })
     }
 
+    function getAccessToken() {
+        fetch('/.netlify/functions/getToken')
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                // accessToken = data.message.data[0].token
+                // console.log(accessToken)
+            })
+    }
+    getAccessToken()
+
     function search() {
 
     }
 
-    console.log('public script running')
-
-    fetch('/.netlify/functions/helloWorld')
-        .then(res => res.json())
-        .then(data => {
-            console.log(data)
-        })
 })(window)
