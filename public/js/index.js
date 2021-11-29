@@ -8,6 +8,7 @@
             .then(res => res.json())
             .then(data => {
                 console.log(data)
+                accessToken = data.token
             })
     }
 
@@ -16,8 +17,11 @@
             .then(res => res.json())
             .then(data => {
                 console.log(data)
-                // accessToken = data.message.data[0].token
-                // console.log(accessToken)
+                if(data.message === 'token expired'){
+                    generateAccessToken()
+                } else {
+                    accessToken = data.token
+                }
             })
     }
     getAccessToken()
