@@ -14,7 +14,10 @@
         <div class="d-flex flex-column w-75">
             
             <div class="input-group mt-5">
-                <input type="text" class="form-control" id="gameSearchField" aria-describedby="bookSearch" placeholder="Search for a game, or character">
+                <input type="checkbox" class="btn-check" id="btn-check" autocomplete="off">
+                <label id="searchType" class="btn btn-primary" for="btn-check">Search by Games</label>
+
+                <input type="text" class="form-control" id="gameSearchField" aria-describedby="bookSearch" placeholder="Search for Games!">
                 <button class="btn btn-dark" type="button" id="gameSearchBtn">Search</button>
             </div>
 
