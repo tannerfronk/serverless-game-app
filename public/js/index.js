@@ -6,6 +6,7 @@
     let accessToken // initialize but don't assign until it has been generated or found
     let searchResults
     let searchResultsDiv = document.querySelector('#searchResults')
+    let resultsNumDiv = document.querySelector('#resultsNum')
 
     // call function to generate access token for IGDB
     function generateAccessToken() {
@@ -34,6 +35,8 @@
 
     // search function
     function search() {
+        resultsNumDiv.innerHTML = ''
+        searchResultsDiv.innerHTML = ''
 
         let searchObj = {
             keyword: searchField.value,
@@ -62,14 +65,16 @@
 
     function appendSearchResults() {
 
-        searchResultsLength = `Results Found: ${searchResults.length}`
+        resultsNum = `Results Found: ${searchResults.length}`
+        console.log(resultsNum)
+        resultsNumDiv.innerHTML = resultsNum
         searchResultsDiv.innerHTML = ''
         searchResults.forEach((game) => {
             searchResultsDiv.innerHTML +=
                 `
                 <div class="card my-2">
                     <div class="card-body">
-                    <img src="game.cover.url" class="card-img-top" alt="${game.name} cover">
+                    <img src="${game.cover.url}" class="card-img-top my-1 w-25" alt="${game.name} cover">
                         <div class="d-flex flex-column float-end w-25">
                             <button id="${game.id}" buttonFunc="addToReadList" class="btn btn-secondary float-end mb-2">Add to List</button>
                             <button id="${game.id}" buttonFunc="completeBook" class="btn btn-secondary float-end">I have played this</button>
