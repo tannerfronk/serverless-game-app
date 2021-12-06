@@ -4,6 +4,8 @@
     let searchField = document.querySelector('#gameSearchField')
     let searchBtn = document.querySelector('#gameSearchBtn')
     let accessToken // initialize but don't assign until it has been generated or found
+    let searchResults
+    let searchResultsDiv = document.querySelector('#searchResults')
 
     // call function to generate access token for IGDB
     function generateAccessToken() {
@@ -45,6 +47,8 @@
             .then(res => res.json())
             .then(data => {
                 console.log(data.result)
+                searchResults = data.result
+                appendSearchResults()
             })
     }
 
@@ -55,5 +59,28 @@
             search()
         }
     })
+
+    function appendSearchResults() {
+
+        searchResultsLength = `Results Found: ${searchResults.length}`
+        searchResultsDiv.innerHTML = ''
+        searchResults.forEach((game) => {
+            searchResultsDiv.innerHTML +=
+                `
+                <div class="card my-2">
+                    <div class="card-body">
+                    <img src="game.cover.url" class="card-img-top" alt="${game.name} cover">
+                        <div class="d-flex flex-column float-end w-25">
+                            <button id="${game.id}" buttonFunc="addToReadList" class="btn btn-secondary float-end mb-2">Add to List</button>
+                            <button id="${game.id}" buttonFunc="completeBook" class="btn btn-secondary float-end">I have played this</button>
+                        </div>
+                        <h5 class="card-title">${game.name}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">${game.summary ?? 'No Description'}</h6>
+                        <p class="card-text">First published: ${game.year ?? 'Unknown'}</p>
+                    </div>
+                </div>
+            `
+        })
+    }
 
 })(window)
