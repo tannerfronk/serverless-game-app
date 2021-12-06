@@ -74,10 +74,10 @@
                 `
                 <div class="card my-2">
                     <div class="card-body">
-                    <img src="${game.cover.url}" class="card-img-top my-1 w-25" alt="${game.name} cover">
+                    <img src="${game.cover === undefined ? 'https://via.placeholder.com/300?text=No+Image+Found' : game.cover.url}" class="card-img-top my-1 w-25" alt="${game.name} cover">
                         <div class="d-flex flex-column float-end w-25">
-                            <button id="${game.id}" buttonFunc="addToReadList" class="btn btn-secondary float-end mb-2">Add to List</button>
-                            <button id="${game.id}" buttonFunc="completeBook" class="btn btn-secondary float-end">I have played this</button>
+                            <button id="${game.id}" buttonFunc="addToReadList" class="btn btn-secondary float-end mb-2">Add to My List</button>
+                            <button id="${game.id}" buttonFunc="completeBook" class="btn btn-secondary float-end">I Have Played This</button>
                         </div>
                         <h5 class="card-title">${game.name}</h5>
                         <h6 class="card-subtitle mb-2 text-muted">${game.summary ?? 'No Description'}</h6>
