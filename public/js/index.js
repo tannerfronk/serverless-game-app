@@ -17,6 +17,7 @@
         10: 'T',
         11: 'M'
     }
+    let loadingSpinner = document.querySelector('#loadingSpinner')
 
     // event listener for search type toggle
     searchTypeBtn.addEventListener('click', () => {
@@ -71,6 +72,9 @@
             searchURI = '/.netlify/functions/searchCharacters'
         }
 
+
+        loadingSpinner.classList.remove('visually-hidden')
+
         fetch(searchURI, {
             method: 'POST',
             body: JSON.stringify(searchObj)
@@ -84,6 +88,7 @@
                 } else {
                     appendCharacterSearchResults()
                 }
+                loadingSpinner.classList.add('visually-hidden')
             })
     }
 
