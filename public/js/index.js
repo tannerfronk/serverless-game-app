@@ -95,6 +95,20 @@
         }
     })
 
+    // general function for getting bigger image 
+    function getBiggerImageURL(obj, url, type){
+        let imageURL = url.split('/')
+        imageURL[6] = 't_cover_big'
+        imageURL = imageURL.join('/')
+        if(type === 'character'){
+            obj.mug_shot.url = imageURL
+        } else {
+            obj.cover.url = imageURL
+        }
+
+        return obj
+    }
+
     // game result card
     function appendGameSearchResults() {
 
@@ -139,6 +153,11 @@
                         wikia = website.url
                     }
                 })
+            }
+
+            // get bigger cover
+            if(game.cover){
+                getBiggerImageURL(game, game.cover.url)
             }
 
             // create date from unix timestamp
@@ -216,6 +235,11 @@
         searchResults.forEach((character) => {
             let games = []
             character.games.forEach((game) => games.push(game.name))
+
+            // get bigger cover
+            if(character.mug_shot){
+                getBiggerImageURL(character, character.mug_shot.url, type = 'character')
+            }
             
             searchResultsDiv.innerHTML +=
                 `
