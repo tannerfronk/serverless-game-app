@@ -99,7 +99,6 @@
     function appendGameSearchResults() {
 
         resultsNum = `Results Found: ${searchResults.length}`
-        console.log(resultsNum)
         resultsNumDiv.innerHTML = resultsNum
         searchResultsDiv.innerHTML = ''
         let gameRating = ''
@@ -167,23 +166,39 @@
                 <div class="modal fade" id="rateModal${game.id}" tabindex="-1">
                         <div class="modal-dialog">
                             <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">${game.name}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
                             <div class="modal-body">
-                                <h6>Genre(s): ${genres.join(', ')}</h6>
+                                ${game.collection ?
+                                `<p class="card-subtitle mb-3">Belongs to the <b>${game.collection.name}</b> series</p>`
+                                : ''
+                                }
+                                <p>Genre(s): ${genres.join(', ')}</p>
                                 ${wikia !== '' ? 
-                                `<p class="mt-3">Wikia Page: <a href="${wikia}" target="_blank">Click Here</a></p>`
+                                    `<p class="mt-3">Wikia Page: <a href="${wikia}" target="_blank">Click Here</a></p>`
                                 : ''}
-                                <p>How would you rate ${game.name} out of 5 stars?</p>
+                                ${game.aggregated_rating ? 
+                                    `<p class="mt-3">Average User Rating: ${game.aggregated_rating.toFixed(2)}</a></p>`
+                                : ''}
+                                <p>How would you rate ${game.name} out of 10 stars?</p>
                                 <select id="rate${game.id}">
                                     <option value="1">1</option>
                                     <option value="2">2</option>
                                     <option value="3">3</option>
                                     <option value="4">4</option>
                                     <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
                                 </select>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button id="${game.id}" type="button" class="btn btn-primary" buttonFunc="rateBook" data-bs-dismiss="modal">Save Rating</button>
+                                <button id="${game.id}" type="button" class="btn btn-primary" buttonFunc="rateGame" data-bs-dismiss="modal">Save Rating</button>
                             </div>
                             </div>
                         </div>
