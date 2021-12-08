@@ -124,6 +124,23 @@
                 })
             }
 
+            // get genre(s)
+            let genres = []
+            if(game.genres){
+                game.genres.forEach(genre => {
+                    genres.push(genre.name)
+                })
+            }
+
+            // get wikia link
+            let wikia = ''
+            if(game.websites){
+                game.websites.forEach(website => {
+                    if(website.category == 2){
+                        wikia = website.url
+                    }
+                })
+            }
 
             // create date from unix timestamp
             let date = new Date(game.first_release_date * 1000).toLocaleDateString("en-US")
@@ -135,7 +152,8 @@
                     <img src="${game.cover === undefined ? 'https://via.placeholder.com/300?text=No+Image+Found' : game.cover.url}" class="card-img-top my-1 w-25" alt="${game.name} cover">
                         <div class="d-flex flex-column float-end w-25">
                             <button id="${game.id}" buttonFunc="" class="btn btn-secondary float-end mb-2">Add to My List</button>
-                            <button id="${game.id}" buttonFunc="" class="btn btn-secondary float-end">I Have Played This</button>
+                            <button id="${game.id}" buttonFunc="" class="btn btn-secondary float-end mb-2">I Have Played This</button>
+                            <button id="${game.id}" buttonFunc="" class="btn btn-secondary float-end" data-bs-toggle="modal" data-bs-target="#rateModal${game.id}">More Info</button>
                         </div>
                         <h5 class="card-title mt-2">${game.name}</h5>
                         <h6 class="card-subtitle mt-2">Developed by: ${companies.join(', ')}</h6>
@@ -146,6 +164,30 @@
                         </div>
                     </div>
                 </div>
+                <div class="modal fade" id="rateModal${game.id}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                            <div class="modal-body">
+                                <h6>Genre(s): ${genres.join(', ')}</h6>
+                                ${wikia !== '' ? 
+                                `<p class="mt-3">Wikia Page: <a href="${wikia}" target="_blank">Click Here</a></p>`
+                                : ''}
+                                <p>How would you rate ${game.name} out of 5 stars?</p>
+                                <select id="rate${game.id}">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button id="${game.id}" type="button" class="btn btn-primary" buttonFunc="rateBook" data-bs-dismiss="modal">Save Rating</button>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
             `
         })
     }
