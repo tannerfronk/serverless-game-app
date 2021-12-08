@@ -104,16 +104,30 @@
         searchResultsDiv.innerHTML = ''
         let gameRating = ''
         searchResults.forEach((game) => {
-            if (game.age_ratings !== undefined){
-                game.age_ratings.forEach((el) => {
+
+            // find esrb rating
+            if (game.age_ratings){
+                game.age_ratings.forEach(el => {
                     if(ratings.hasOwnProperty(el.rating)){
                         return gameRating = ratings[el.rating]
                     }
                 })
             }
 
+            // get involved companies
+            let companies = []
+            if(game.involved_companies){
+                game.involved_companies.forEach(el => {
+                    if(el.company.name){
+                        companies.push(el.company.name)
+                    }
+                })
+            }
+
+
+            // create date from unix timestamp
             let date = new Date(game.first_release_date * 1000).toLocaleDateString("en-US")
-            console.log(date)
+
             searchResultsDiv.innerHTML +=
                 `
                 <div class="card my-2">
@@ -124,7 +138,7 @@
                             <button id="${game.id}" buttonFunc="" class="btn btn-secondary float-end">I Have Played This</button>
                         </div>
                         <h5 class="card-title mt-2">${game.name}</h5>
-                        
+                        <h6 class="card-subtitle mt-2">Developed by: ${companies.join(', ')}</h6>
                         <h6 class="card-subtitle my-3 text-muted">${game.summary ?? 'No Description Available'}</h6>
                         <div class="d-flex justify-content-between">
                             <p class="card-text">First published: ${game.first_release_date ? date : 'Unknown'}</p>
