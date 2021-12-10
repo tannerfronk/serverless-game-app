@@ -177,9 +177,9 @@
                     <div class="card-body">
                     <img src="${game.cover === undefined ? 'https://via.placeholder.com/300?text=No+Image+Found' : game.cover.url}" class="card-img-top my-1 w-25" alt="${game.name} cover">
                         <div class="d-flex flex-column float-end w-25">
-                            <button id="${game.id}" buttonFunc="handlePlaylist" class="btn btn-secondary float-end mb-2">${game.onPlaylist ? 'On List  <i class="fas fa-check"></i>' : 'Add to My List'}</button>
-                            <button id="${game.id}" buttonFunc="" class="btn btn-secondary float-end mb-2">I Have Played This</button>
-                            <button id="${game.id}" buttonFunc="" class="btn btn-secondary float-end" data-bs-toggle="modal" data-bs-target="#rateModal${game.id}">More Info</button>
+                            <button id="${game.id}" buttonFunc="handlePlaylist" class="btn btn-secondary float-end mb-2">${game.onPlaylist ? 'On List <i class="fas fa-check"></i>' : 'Add to My List'}</button>
+                            <button id="${game.id}" buttonFunc="handleComplete" class="btn btn-secondary float-end mb-2">${game.completed ? 'Completed <i class="fas fa-check"></i>': 'I Have Played This'}</button>
+                            <button id="${game.id}" class="btn btn-secondary float-end" data-bs-toggle="modal" data-bs-target="#rateModal${game.id}">More Info</button>
                         </div>
                         <h5 class="card-title mt-2">${game.name}</h5>
                         <h6 class="card-subtitle mt-2">Developed by: ${companies.join(', ')}</h6>
@@ -268,17 +268,25 @@
     }
 
     // handle add to list or remove from list
-    function handlePlaylist(event){
+    function handlePlaylist(event, type, url){
         let gameID = event.target.id
         let game = searchResults.find(game => game.id == gameID)
 
-        if (!game.onPlaylist) {
-            game.onPlaylist = true
+        if(type == 'onPlaylist'){
+            if (!game.onPlaylist) {
+                game.onPlaylist = true
+            } else {
+                game.onPlaylist = false
+            }
         } else {
-            game.onPlaylist = false
+            if (!game.completed) {
+                game.completed = true
+            } else {
+                game.completed = false
+            }
         }
 
-        fetch('/.netlify/functions/handlePlaylist', {
+        fetch(url, {
             method: 'POST',
             body: JSON.stringify(game),
             headers: {
@@ -297,13 +305,16 @@
                 appendGameSearchResults()
             }
         })
-
     }
 
     document.addEventListener('click', (e) => {
         let attribute = e.target.attributes.buttonFunc
         if(attribute && attribute.value === 'handlePlaylist'){
-            handlePlaylist(e)
+            let url = '/.netlify/functions/handlePlaylist'
+            handlePlaylist(e, 'onPlaylist', url)
+        } else if(attribute && attribute.value === 'handleComplete'){
+            let url = '/.netlify/functions/handleComplete'
+            handlePlaylist(e, 'onComplete', url)
         }
     })
 

@@ -12,12 +12,12 @@ exports.handler = async function (event, context) {
     let allGames
     
     let gameExists = await Game.findOne({ id: gameBody.id })
-    if ((gameExists && !gameBody.onPlaylist && !gameBody.completed)){
+    if ((gameExists && !gameBody.completed && !gameBody.onPlaylist)){
 
         // remove from db and send back existing list of games
         const result = await Game.findOneAndDelete({ id: gameBody.id })
                 .then(doc => {
-                    console.log(`${gameExists.name} was removed from playlist and DB`)
+                    console.log(`${gameExists.name} was removed from completed list and DB`)
                 })
                 .then(async () => {
                     allGames = await Game.find()
@@ -43,14 +43,14 @@ exports.handler = async function (event, context) {
                 genre: gameBody.genres,
                 wikia: gameBody.wikia,
                 aggregated_rating: gameBody.aggregated_rating,
-                onPlaylist: true,
-                completed: false
+                onPlaylist: false,
+                completed: true
             })
     
             // send to DB
             const result = await newGame.save()
                 .then(doc => {
-                    console.log(`Added ${newGame.name} to playlist.`)
+                    console.log(`Added ${newGame.name} to completed list.`)
                 })
                 .then(async () => {
                     allGames = await Game.find()
@@ -59,24 +59,22 @@ exports.handler = async function (event, context) {
             return {
                 statusCode: 200,
                 body: JSON.stringify({
-                    message: 'game was added to playlist',
+                    message: 'game was added to completed list',
                     games: allGames
                 })
             }
         } else {
 
-            if(gameExists.onPlaylist){
-                gameExists.onPlaylist = false
-            } else {
-                gameExists.onPlaylist = true
-            }
+            gameExists.completed = !gameExists.completed
 
             let result = await gameExists.save()
+
+            console.log(`${gameExists.completed ? `${gameExists.name} is now marked as complete` : `${gameExists.name} has been removed from completed list`}`)
 
             return {
                 statusCode: 200,
                 body: JSON.stringify({
-                    message: `${gameExists.onPlaylist ? `${gameExists.name} is now on playlist` : `${gameExists.name} has been removed from playlist`}`,
+                    message: `${gameExists.completed ? `${gameExists.name} is now marked as complete` : `${gameExists.name} has been removed from completed list`}`,
                     games: allGames,
                     change: result
                 })
