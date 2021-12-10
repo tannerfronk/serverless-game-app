@@ -18,7 +18,6 @@ exports.handler = async function (event, context) {
         })
         .then(res => res.json())
         .then(data => {
-            console.log(JSON.stringify({ data }))
             result = data
         })
 

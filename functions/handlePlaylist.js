@@ -8,6 +8,9 @@ mongoose.connect(mongoURI, {
 })
 
 exports.handler = async function (event, context) {
+    let gameBody = JSON.parse(event.body)
+    let allGames
+    
     let gameExists = await Game.findOne({ id: event.body.id })
     if (gameExists && event.body.onPlaylist === false){
 
@@ -25,36 +28,36 @@ exports.handler = async function (event, context) {
                 })
     } else {
         const newGame = new Game({
-            id: event.body.id,
-            cover: event.body.cover,
-            name: event.body.name,
-            companies: event.body.companies,
-            summary: event.body.summary,
-            first_release_date: event.body.first_release_date,
-            esrb_rating: event.body.esrb_rating,
-            collection: event.body.collection,
-            genre: event.body.genres,
-            wikia: event.body.wikia,
-            aggregated_rating: event.body.aggregated_rating,
-            onPlaylist: event.body.onPlaylist,
-            completed: event.body.completed
+            id: gameBody.id,
+            cover: gameBody.cover.url,
+            name: gameBody.name,
+            companies: gameBody.companies,
+            summary: gameBody.summary,
+            first_release_date: gameBody.first_release_date,
+            esrb_rating: gameBody.esrb_rating,
+            gameCollection: gameBody.collection.name,
+            genre: gameBody.genres,
+            wikia: gameBody.wikia,
+            aggregated_rating: gameBody.aggregated_rating,
+            onPlaylist: true,
+            completed: gameBody.completed
         })
 
         // send to DB
-        const result = newGame.save()
+        const result = await newGame.save()
             .then(doc => {
-                console.log(doc)
-                console.log(`Added ${newGame.name} to reading list.`)
+                console.log(`Added ${newGame.name} to playlist.`)
             })
             .then(async () => {
-                let allGames = await Game.find()
-                return {
-                    statusCode: 200,
-                    body: JSON.stringify({
-                        message: 'Book was added to playlist',
-                        games: allGames
-                    })
-                }
+                allGames = await Game.find()
             })
+            
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                message: 'game was added to playlist',
+                games: allGames
+            })
+        }
     }
 }

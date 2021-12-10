@@ -8,18 +8,12 @@ const Game = new Schema({
     summary: String,
     first_release_date: String,
     esrb_rating: String,
-    collection: String,
+    gameCollection: String,
     genre: Array,
     wikia: String,
     aggregated_rating: String,
-    onPlaylist: {
-        required: true,
-        type: Boolean,
-    },
-    completed: {
-        required: true,
-        type: Boolean
-    }
+    onPlaylist: Boolean,
+    completed: Boolean
 })
 
 
