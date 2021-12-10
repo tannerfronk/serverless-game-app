@@ -174,7 +174,7 @@
                     <div class="card-body">
                     <img src="${game.cover === undefined ? 'https://via.placeholder.com/300?text=No+Image+Found' : game.cover.url}" class="card-img-top my-1 w-25" alt="${game.name} cover">
                         <div class="d-flex flex-column float-end w-25">
-                            <button id="${game.id}" buttonFunc="" class="btn btn-secondary float-end mb-2">Add to My List</button>
+                            <button id="${game.id}" buttonFunc="handlePlaylist" class="btn btn-secondary float-end mb-2">Add to My List</button>
                             <button id="${game.id}" buttonFunc="" class="btn btn-secondary float-end mb-2">I Have Played This</button>
                             <button id="${game.id}" buttonFunc="" class="btn btn-secondary float-end" data-bs-toggle="modal" data-bs-target="#rateModal${game.id}">More Info</button>
                         </div>
@@ -263,5 +263,24 @@
             `
         })
     }
+
+    // handle add to list or remove from list
+    function handlePlaylist(event){
+        console.log('beep')
+        let gameID = event.target.id
+        console.log('gameID ' + gameID)
+        let game = searchResults.find(game => game.id == gameID)
+        let games = searchResults.forEach(game => console.log(game.id))
+
+        console.log(game)
+
+    }
+
+    document.addEventListener('click', (e) => {
+        let attribute = e.target.attributes.buttonFunc
+        if(attribute && attribute.value === 'handlePlaylist'){
+            handlePlaylist(e)
+        }
+    })
 
 })(window)
