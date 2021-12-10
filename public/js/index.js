@@ -268,7 +268,7 @@
     }
 
     // handle add to list or remove from list
-    function handlePlaylist(event, type, url){
+    function handleListUpdate(event, type, url){
         let gameID = event.target.id
         let game = searchResults.find(game => game.id == gameID)
 
@@ -307,14 +307,41 @@
         })
     }
 
+    // request for rating a game
+    function handleRateGame(event){
+        let gameID = event.target.id
+        let game = searchResults.find(game => game.id == gameID)
+        let rating = document.querySelector('#rate' + gameID).value
+        game.userRating = rating
+        console.log(gameID)
+        console.log('#rate' + gameID)
+        console.log(rating)
+
+        fetch('/.netlify/functions/rateGame', {
+            method: 'PUT',
+            body: JSON.stringify(game),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            games = data.games
+            console.log(data)
+            // displayCompletedList() need to create this function
+        })
+    }
+
     document.addEventListener('click', (e) => {
         let attribute = e.target.attributes.buttonFunc
         if(attribute && attribute.value === 'handlePlaylist'){
             let url = '/.netlify/functions/handlePlaylist'
-            handlePlaylist(e, 'onPlaylist', url)
+            handleListUpdate(e, 'onPlaylist', url)
         } else if(attribute && attribute.value === 'handleComplete'){
             let url = '/.netlify/functions/handleComplete'
-            handlePlaylist(e, 'onComplete', url)
+            handleListUpdate(e, 'onComplete', url)
+        } else if(attribute && attribute.value === 'rateGame'){
+            handleRateGame(e)
         }
     })
 

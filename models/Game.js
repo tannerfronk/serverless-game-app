@@ -7,13 +7,14 @@ const Game = new Schema({
     companies: Array,
     summary: String,
     first_release_date: String,
-    esrb_rating: String,
+    esrbRating: String,
     gameCollection: String,
     genre: Array,
     wikia: String,
-    aggregated_rating: String,
+    aggregatedRating: String,
     onPlaylist: Boolean,
-    completed: Boolean
+    completed: Boolean,
+    userRating: String,
 })
 
 

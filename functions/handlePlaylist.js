@@ -38,13 +38,14 @@ exports.handler = async function (event, context) {
                 companies: gameBody.companies,
                 summary: gameBody.summary,
                 first_release_date: gameBody.first_release_date,
-                esrb_rating: gameBody.esrb_rating,
+                esrbRating: gameBody.esrb_rating,
                 gameCollection: gameBody.collection.name,
                 genre: gameBody.genres,
                 wikia: gameBody.wikia,
-                aggregated_rating: gameBody.aggregated_rating,
+                aggregatedRating: gameBody.aggregated_rating,
                 onPlaylist: true,
-                completed: false
+                completed: false,
+                userRating: ''
             })
     
             // send to DB
