@@ -11,53 +11,71 @@ exports.handler = async function (event, context) {
     let gameBody = JSON.parse(event.body)
     let allGames
     
-    let gameExists = await Game.findOne({ id: event.body.id })
-    if (gameExists && event.body.onPlaylist === false){
+    let gameExists = await Game.findOne({ id: gameBody.id })
+    if ((gameExists && !gameBody.onPlaylist) || (gameExists && gameBody.onPlaylist)){
 
+
+    console.log(gameExists)
         // remove from db and send back existing list of games
-        const result = await Game.findOneAndDelete({ id: req.body.id })
-                .then(async () => {
-                    let allGames = await Book.find()
-                    return {
-                        statusCode: 200,
-                        body: JSON.stringify({
-                            message: 'Book was removed from playlist and DB',
-                            games: allGames
-                        })
-                    }
+        const result = await Game.findOneAndDelete({ id: gameBody.id })
+                .then(doc => {
+                    console.log(`${gameExists.name} was removed from playlist and DB`)
                 })
-    } else {
-        const newGame = new Game({
-            id: gameBody.id,
-            cover: gameBody.cover.url,
-            name: gameBody.name,
-            companies: gameBody.companies,
-            summary: gameBody.summary,
-            first_release_date: gameBody.first_release_date,
-            esrb_rating: gameBody.esrb_rating,
-            gameCollection: gameBody.collection.name,
-            genre: gameBody.genres,
-            wikia: gameBody.wikia,
-            aggregated_rating: gameBody.aggregated_rating,
-            onPlaylist: true,
-            completed: gameBody.completed
-        })
+                .then(async () => {
+                    allGames = await Game.find()
+                })
 
-        // send to DB
-        const result = await newGame.save()
-            .then(doc => {
-                console.log(`Added ${newGame.name} to playlist.`)
+                return {
+                    statusCode: 200,
+                    body: JSON.stringify({
+                        games: allGames
+                    })
+                }
+    } else {
+        if(!gameExists){
+            const newGame = new Game({
+                id: gameBody.id,
+                cover: gameBody.cover.url,
+                name: gameBody.name,
+                companies: gameBody.companies,
+                summary: gameBody.summary,
+                first_release_date: gameBody.first_release_date,
+                esrb_rating: gameBody.esrb_rating,
+                gameCollection: gameBody.collection.name,
+                genre: gameBody.genres,
+                wikia: gameBody.wikia,
+                aggregated_rating: gameBody.aggregated_rating,
+                onPlaylist: true,
+                completed: gameBody.completed
             })
-            .then(async () => {
-                allGames = await Game.find()
-            })
-            
-        return {
-            statusCode: 200,
-            body: JSON.stringify({
-                message: 'game was added to playlist',
-                games: allGames
-            })
+    
+            // send to DB
+            const result = await newGame.save()
+                .then(doc => {
+                    console.log(`Added ${newGame.name} to playlist.`)
+                })
+                .then(async () => {
+                    allGames = await Game.find()
+                })
+    
+            return {
+                statusCode: 200,
+                body: JSON.stringify({
+                    message: 'game was added to playlist',
+                    games: allGames
+                })
+            }
+        } else {
+            gameExists.onPlaylist = !gameExists.onPlaylist
+            gameExists.save()
+
+            return {
+                statusCode: 200,
+                body: JSON.stringify({
+                    message: `${gameExists.onPlaylist ? `${gameExists.name} is now on playlist` : `${gameExists.name} has been removed from playlist`}`,
+                    games: allGames
+                })
+            }
         }
     }
 }

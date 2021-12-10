@@ -272,7 +272,7 @@
         let gameID = event.target.id
         let game = searchResults.find(game => game.id == gameID)
 
-        if (!game.read) {
+        if (!game.onPlaylist) {
             game.onPlaylist = true
         } else {
             game.onPlaylist = false
