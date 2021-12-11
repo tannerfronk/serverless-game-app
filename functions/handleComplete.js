@@ -17,7 +17,7 @@ exports.handler = async function (event, context) {
         // remove from db and send back existing list of games
         const result = await Game.findOneAndDelete({ id: gameBody.id })
                 .then(doc => {
-                    console.log(`${gameExists.name} was removed from completed list and DB`)
+                    console.log(`${gameExists.name} was removed from completed list and DB.`)
                 })
                 .then(async () => {
                     allGames = await Game.find()
@@ -60,7 +60,7 @@ exports.handler = async function (event, context) {
             return {
                 statusCode: 200,
                 body: JSON.stringify({
-                    message: 'game was added to completed list',
+                    message: `${newGame.name} was added to completed list.`,
                     games: allGames
                 })
             }
@@ -74,7 +74,7 @@ exports.handler = async function (event, context) {
             return {
                 statusCode: 200,
                 body: JSON.stringify({
-                    message: `${gameExists.completed ? `${gameExists.name} is now marked as complete` : `${gameExists.name} has been removed from completed list`}`,
+                    message: `${gameExists.completed ? `${gameExists.name} is now marked as complete` : `${gameExists.name} has been removed from completed list.`}`,
                     games: allGames,
                     change: result
                 })

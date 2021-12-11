@@ -1,6 +1,5 @@
 (function (window) {
 
-    const clientID = 'm0wt6yc28s2jcn0xgw5jdehpgipc2t'
     let searchField = document.querySelector('#gameSearchField')
     let searchBtn = document.querySelector('#gameSearchBtn')
     let accessToken // initialize but don't assign until it has been generated or found
@@ -27,8 +26,14 @@
     })
 
     // event listener for view changing buttons
-    playlistViewBtn.addEventListener('click', () => currentView = 'playlist')
-    completedListViewBtn.addEventListener('click', () => currentView = 'completed')
+    playlistViewBtn.addEventListener('click', () => {
+        currentView = 'playlist'
+        resultsNumDiv.innerHTML = `Games on Your List: ${searchResults.length}`
+    })
+    completedListViewBtn.addEventListener('click', () => {
+        currentView = 'completed'
+        resultsNumDiv.innerHTML = `Games you have completed: ${searchResults.length}`
+    })
 
     // call function to generate access token for IGDB
     function generateAccessToken() {
@@ -111,7 +116,7 @@
 
             searchResultsDiv.innerHTML +=
                 `
-                <div class="card my-2">
+                <div class="card bg-dark my-2">
                     <div class="card-body">
                     <img src="${game.cover === undefined ? 'https://via.placeholder.com/300?text=No+Image+Found' : game.cover}" class="card-img-top my-1 w-25" alt="${game.name} cover">
                         <div class="d-flex flex-column float-end w-25">
@@ -119,41 +124,41 @@
                             <button id="${game.id}" buttonFunc="handleComplete" class="btn btn-secondary float-end mb-2">${game.completed ? 'Completed <i class="fas fa-check"></i>' : 'I Have Played This'}</button>
                             <button id="${game.id}" class="btn btn-secondary float-end" data-bs-toggle="modal" data-bs-target="#rateModal${game.id}">More Info</button>
                         </div>
-                        <h5 class="card-title mt-2">${game.name}</h5>
-                        <h6 class="card-subtitle mt-2">Developed by: ${game.companies.join(', ')}</h6>
+                        <h5 class="card-title text-white mt-2">${game.name}</h5>
+                        <h6 class="card-subtitle text-white mt-2">Developed by: ${game.companies.join(', ')}</h6>
                         <h6 class="card-subtitle my-3 text-muted">${game.summary ?? 'No Description Available'}</h6>
                         <div class="d-flex justify-content-between">
-                            <p class="card-text">First published: ${game.releaseDate ? game.releaseDate : 'Unknown'}</p>
-                            <p class="card-text text-end">${game.esrbRating !== '' ? 'ESRB Rating: ' + game.esrbRating : "No ESRB Rating Available"}</p>
+                            <p class="card-text text-white">First published: ${game.releaseDate ? game.releaseDate : 'Unknown'}</p>
+                            <p class="card-text text-white text-end">${game.esrbRating !== '' ? 'ESRB Rating: ' + game.esrbRating : "No ESRB Rating Available"}</p>
                         </div>
                     </div>
                 </div>
                 <div class="modal fade" id="rateModal${game.id}" tabindex="-1">
                         <div class="modal-dialog">
-                            <div class="modal-content">
+                            <div class="modal-content bg-dark">
                             <div class="modal-header">
-                                <h5 class="modal-title">${game.name}</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <h5 class="modal-title text-white">${game.name}</h5>
+                                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 ${game.gameCollection ?
-                                    `<p class="card-subtitle mb-3">Belongs to the <b>${game.gameCollection}</b> series</p>`
+                                    `<p class="card-subtitle mb-3 text-white">Belongs to the <b>${game.gameCollection}</b> series</p>`
                                     : ''
                                 }
                                 ${game.genre ?
-                                    `<p>Genre(s): ${game.genre.join(', ')}</p>`
+                                    `<p class="text-white">Genre(s): ${game.genre.join(', ')}</p>`
                                     : ''
                                 }
                                 ${game.wikia !== '' ?
-                                    `<p class="mt-3">Wikia Page: <a href="${game.wikia}" target="_blank">Click Here</a></p>`
+                                    `<p class="mt-3 text-white">Wikia Page: <a href="${game.wikia}" target="_blank">Click Here</a></p>`
                                     : ''
                                 }
                                 ${game.aggregatedRating ?
-                                    `<p class="mt-3">Average User Rating: ${game.aggregatedRating.toFixed(2)}</a></p>`
+                                    `<p class="mt-3 text-white">Average User Rating: ${game.aggregatedRating.toFixed(2)}</a></p>`
                                     : ''
                                 }
                                 ${game.completed || game.onPlaylist ?
-                                    `<p>How would you rate ${game.name} out of 10 stars?</p>
+                                    `<p class="text-white">How would you rate ${game.name} out of 10 stars?</p>
                                                 <select id="rate${game.id}">
                                                     <option value="1">1</option>
                                                     <option value="2">2</option>

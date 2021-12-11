@@ -17,7 +17,7 @@ exports.handler = async function (event, context) {
         // remove from db and send back existing list of games
         const result = await Game.findOneAndDelete({ id: gameBody.id })
                 .then(doc => {
-                    console.log(`${gameExists.name} was removed from playlist and DB`)
+                    console.log(`${gameExists.name} was removed from playlist and DB.`)
                 })
                 .then(async () => {
                     allGames = await Game.find()
@@ -60,7 +60,7 @@ exports.handler = async function (event, context) {
             return {
                 statusCode: 200,
                 body: JSON.stringify({
-                    message: `${newGame.name} was added to playlist`,
+                    message: `${newGame.name} was added to playlist.`,
                     games: allGames
                 })
             }
@@ -78,7 +78,7 @@ exports.handler = async function (event, context) {
             return {
                 statusCode: 200,
                 body: JSON.stringify({
-                    message: `${gameExists.onPlaylist ? `${gameExists.name} is now on playlist` : `${gameExists.name} has been removed from playlist`}`,
+                    message: `${gameExists.onPlaylist ? `${gameExists.name} is now on playlist` : `${gameExists.name} has been removed from playlist.`}`,
                     games: allGames,
                     change: result
                 })
