@@ -217,20 +217,18 @@
         resultsNumDiv.innerHTML = resultsNum
         searchResultsDiv.innerHTML = ''
         searchResults.forEach((character) => {
-            let games = []
-            character.games.forEach((game) => games.push(game.name))
 
             searchResultsDiv.innerHTML +=
                 `
                 <div class="card my-2">
                     <div class="card-body bg-dark">
-                    <img src="${character.mug_shot === undefined ? 'https://via.placeholder.com/300?text=No+Image+Found' : character.mug_shot.url}" class="card-img-top my-1 w-25" alt="${character.name} mug shot">
+                    <img src="${character.mugShot === undefined ? 'https://via.placeholder.com/300?text=No+Image+Found' : character.mugShot}" class="card-img-top my-1 w-25" alt="${character.name} mug shot">
                         <div class="d-flex flex-column float-end w-25">
-                            <button id="${character.id}" buttonFunc="" class="btn btn-secondary float-end mb-2">Add to Favorites</button>
+                            <button id="${character.id}" buttonFunc="handleFavorite" class="btn btn-secondary float-end mb-2">${character.favorite ? 'On Favorites <i class="fas fa-check"></i>' : 'Add to Favorites'}</button>
                         </div>
                         <h5 class="card-title mt-1 text-white">${character.name}</h5>
                         <div class="d-flex justify-content-between my-3">
-                            <h6 class="card-subtitle text-white">Appears in: ${games.join(',   ')}</h6>
+                            <h6 class="card-subtitle text-white">Appears in: ${character.games.join(',   ')}</h6>
                             <h6 class="card-subtitle text-white">AKA: ${character.akas ? character.akas.join(', ') : 'N/A'}</h6>
                         </div>
                         <h6 class="card-subtitle mb-2 text-muted">${character.description ?? 'No Description Available'}</h6>
@@ -293,6 +291,31 @@
             })
     }
 
+    function handleCharacterListUpdate(event){
+        let charID = event.target.id
+        let character = searchResults.find(character => character.id == charID)
+
+        if (!character.favorite) {
+            character.favorite = true
+        } else {
+            character.favorite = false
+        }
+
+        fetch('/.netlify/functions/favoriteCharacter', {
+            method: 'POST',
+            body: JSON.stringify(character),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log(data)
+            appendCharacterSearchResults()
+        })
+
+    }
+
     document.addEventListener('click', (e) => {
         let attribute = e.target.attributes.buttonFunc
         if (attribute && attribute.value === 'handlePlaylist') {
@@ -303,6 +326,8 @@
             handleGameListUpdate(e, 'onComplete', url)
         } else if (attribute && attribute.value === 'rateGame') {
             handleRateGame(e)
+        } else if (attribute && attribute.value === 'handleFavorite') {
+            handleCharacterListUpdate(e)
         }
     })
 
