@@ -20,17 +20,23 @@
     let loadingSpinner = document.querySelector('#loadingSpinner')
     let games
     let currentView = 'search' // initialize current view for rendering 
+    let playlistViewBtn = document.querySelector('#playlistView')
+    let completedListViewBtn = document.querySelector('#completedView')
 
     // event listener for search type toggle
     searchTypeBtn.addEventListener('click', () => {
-        if(searchType === 'Games'){
+        if (searchType === 'Games') {
             searchType = 'Characters'
-        } else if(searchType === 'Characters'){
+        } else if (searchType === 'Characters') {
             searchType = 'Games'
         }
         searchTypeBtn.innerHTML = `Search by ${searchType}`
         searchField.placeholder = `Search for ${searchType}!`
     })
+
+    // event listener for view changing buttons
+    playlistViewBtn.addEventListener('click', () => currentView = 'playlist')
+    completedListViewBtn.addEventListener('click', () => currentView = 'completed')
 
     // call function to generate access token for IGDB
     function generateAccessToken() {
@@ -69,9 +75,9 @@
             token: accessToken
         }
 
-        if(searchType === 'Games'){
+        if (searchType === 'Games') {
             searchURI = '/.netlify/functions/searchGames'
-        } else if(searchType === 'Characters'){
+        } else if (searchType === 'Characters') {
             searchURI = '/.netlify/functions/searchCharacters'
         }
 
@@ -86,7 +92,7 @@
             .then(data => {
                 console.log(data.result)
                 searchResults = data.result
-                if(searchType === 'Games'){
+                if (searchType === 'Games') {
                     appendGameSearchResults()
                 } else {
                     appendCharacterSearchResults()
@@ -104,11 +110,11 @@
     })
 
     // general function for getting bigger image 
-    function getBiggerImageURL(obj, url, type){
+    function getBiggerImageURL(obj, url, type) {
         let imageURL = url.split('/')
         imageURL[6] = 't_cover_big'
         imageURL = imageURL.join('/')
-        if(type === 'character'){
+        if (type === 'character') {
             obj.mug_shot.url = imageURL
         } else {
             obj.cover.url = imageURL
@@ -123,70 +129,29 @@
         resultsNum = `Results Found: ${searchResults.length}`
         resultsNumDiv.innerHTML = resultsNum
         searchResultsDiv.innerHTML = ''
-        let gameRating = ''
-        searchResults.forEach((game) => {
+        searchResults.forEach(async (game, index) => {
 
-            // find esrb rating
-            if (game.age_ratings){
-                game.age_ratings.forEach(el => {
-                    if(ratings.hasOwnProperty(el.rating)){
-                        return gameRating = ratings[el.rating]
-                    }
-                })
+            if (currentView === 'search') {
+                game = await mapSearchResultsToCardObj(game)
+                searchResults[index] = game
             }
-
-            // get involved companies
-            let companies = []
-            if(game.involved_companies){
-                game.involved_companies.forEach(el => {
-                    if(el.company.name){
-                        companies.push(el.company.name)
-                    }
-                })
-            }
-
-            // get genre(s)
-            let genres = []
-            if(game.genres){
-                game.genres.forEach(genre => {
-                    genres.push(genre.name)
-                })
-            }
-
-            // get wikia link
-            let wikia = ''
-            if(game.websites){
-                game.websites.forEach(website => {
-                    if(website.category == 2){
-                        wikia = website.url
-                    }
-                })
-            }
-
-            // get bigger cover
-            if(game.cover){
-                getBiggerImageURL(game, game.cover.url)
-            }
-
-            // create date from unix timestamp
-            let date = new Date(game.first_release_date * 1000).toLocaleDateString("en-US")
 
             searchResultsDiv.innerHTML +=
                 `
                 <div class="card my-2">
                     <div class="card-body">
-                    <img src="${game.cover === undefined ? 'https://via.placeholder.com/300?text=No+Image+Found' : game.cover.url}" class="card-img-top my-1 w-25" alt="${game.name} cover">
+                    <img src="${game.cover === undefined ? 'https://via.placeholder.com/300?text=No+Image+Found' : game.cover}" class="card-img-top my-1 w-25" alt="${game.name} cover">
                         <div class="d-flex flex-column float-end w-25">
                             <button id="${game.id}" buttonFunc="handlePlaylist" class="btn btn-secondary float-end mb-2">${game.onPlaylist ? 'On List <i class="fas fa-check"></i>' : 'Add to My List'}</button>
-                            <button id="${game.id}" buttonFunc="handleComplete" class="btn btn-secondary float-end mb-2">${game.completed ? 'Completed <i class="fas fa-check"></i>': 'I Have Played This'}</button>
+                            <button id="${game.id}" buttonFunc="handleComplete" class="btn btn-secondary float-end mb-2">${game.completed ? 'Completed <i class="fas fa-check"></i>' : 'I Have Played This'}</button>
                             <button id="${game.id}" class="btn btn-secondary float-end" data-bs-toggle="modal" data-bs-target="#rateModal${game.id}">More Info</button>
                         </div>
                         <h5 class="card-title mt-2">${game.name}</h5>
-                        <h6 class="card-subtitle mt-2">Developed by: ${companies.join(', ')}</h6>
+                        <h6 class="card-subtitle mt-2">Developed by: ${game.companies.join(', ')}</h6>
                         <h6 class="card-subtitle my-3 text-muted">${game.summary ?? 'No Description Available'}</h6>
                         <div class="d-flex justify-content-between">
-                            <p class="card-text">First published: ${game.first_release_date ? date : 'Unknown'}</p>
-                            <p class="card-text text-end">${gameRating !== '' ? 'ESRB Rating: ' + gameRating : "No ESRB Rating Available"}</p>
+                            <p class="card-text">First published: ${game.releaseDate ? game.releaseDate : 'Unknown'}</p>
+                            <p class="card-text text-end">${game.esrbRating !== '' ? 'ESRB Rating: ' + game.esrbRating : "No ESRB Rating Available"}</p>
                         </div>
                     </div>
                 </div>
@@ -199,39 +164,52 @@
                             </div>
                             <div class="modal-body">
                                 ${game.collection ?
-                                `<p class="card-subtitle mb-3">Belongs to the <b>${game.collection.name}</b> series</p>`
-                                : ''
+                                    `<p class="card-subtitle mb-3">Belongs to the <b>${game.collection}</b> series</p>`
+                                    : ''
                                 }
-                                <p>Genre(s): ${genres.join(', ')}</p>
-                                ${wikia !== '' ? 
-                                    `<p class="mt-3">Wikia Page: <a href="${wikia}" target="_blank">Click Here</a></p>`
-                                : ''}
-                                ${game.aggregated_rating ? 
-                                    `<p class="mt-3">Average User Rating: ${game.aggregated_rating.toFixed(2)}</a></p>`
-                                : ''}
-                                <p>How would you rate ${game.name} out of 10 stars?</p>
-                                <select id="rate${game.id}">
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                    <option value="7">7</option>
-                                    <option value="8">8</option>
-                                    <option value="9">9</option>
-                                    <option value="10">10</option>
-                                </select>
+                                ${game.genre ?
+                                    `<p>Genre(s): ${game.genre.join(', ')}</p>`
+                                    : ''
+                                }
+                                ${game.wikia !== '' ?
+                                    `<p class="mt-3">Wikia Page: <a href="${game.wikia}" target="_blank">Click Here</a></p>`
+                                    : ''
+                                }
+                                ${game.aggregatedRating ?
+                                    `<p class="mt-3">Average User Rating: ${game.aggregatedRating.toFixed(2)}</a></p>`
+                                    : ''
+                                }
+                                ${game.completed || game.onPlaylist ?
+                                    `<p>How would you rate ${game.name} out of 10 stars?</p>
+                                                <select id="rate${game.id}">
+                                                    <option value="1">1</option>
+                                                    <option value="2">2</option>
+                                                    <option value="3">3</option>
+                                                    <option value="4">4</option>
+                                                    <option value="5">5</option>
+                                                    <option value="6">6</option>
+                                                    <option value="7">7</option>
+                                                    <option value="8">8</option>
+                                                    <option value="9">9</option>
+                                                    <option value="10">10</option>
+                                                </select>`
+                                    : ''
+                                }
+                                
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button id="${game.id}" type="button" class="btn btn-primary" buttonFunc="rateGame" data-bs-dismiss="modal">Save Rating</button>
+                                ${game.completed || game.onPlaylist ?
+                                    `<button id="${game.id}" type="button" class="btn btn-primary" buttonFunc="rateGame" data-bs-dismiss="modal">Save Rating</button>`
+                                    : ''
+                                }
                             </div>
                             </div>
                         </div>
                     </div>
             `
         })
+        console.log(searchResults)
     }
 
     // character result card
@@ -245,10 +223,10 @@
             character.games.forEach((game) => games.push(game.name))
 
             // get bigger cover
-            if(character.mug_shot){
+            if (character.mug_shot) {
                 getBiggerImageURL(character, character.mug_shot.url, type = 'character')
             }
-            
+
             searchResultsDiv.innerHTML +=
                 `
                 <div class="card my-2">
@@ -259,7 +237,7 @@
                         </div>
                         <h5 class="card-title mt-1">${character.name}</h5>
                         <h6 class="card-subtitle my-3 text-muted">Appears in: ${games.join(',   ')}</h6>
-                        <h6 class="card-subtitle mb-2 text-muted">${character.description ?? 'No Description Available' }</h6>
+                        <h6 class="card-subtitle mb-2 text-muted">${character.description ?? 'No Description Available'}</h6>
                         <p class="card-text">AKA: ${character.akas ? character.akas.join(', ') : 'N/A'}</p>
                     </div>
                 </div>
@@ -267,12 +245,12 @@
         })
     }
 
-    // handle add to list or remove from list
-    function handleListUpdate(event, type, url){
+    // handle add to list or remove from playlist or completed list
+    function handleListUpdate(event, type, url) {
         let gameID = event.target.id
         let game = searchResults.find(game => game.id == gameID)
 
-        if(type == 'onPlaylist'){
+        if (type == 'onPlaylist') {
             if (!game.onPlaylist) {
                 game.onPlaylist = true
             } else {
@@ -293,22 +271,23 @@
                 'Content-type': 'application/json; charset=UTF-8'
             }
         })
-        .then(res => res.json())
-        .then(data => {
-            games = data.games
+            .then(res => res.json())
+            .then(data => {
+                games = data.games
+                console.log(games)
 
-            if (currentView === 'completed') {
+                if (currentView === 'completed') {
 
-            } else if (currentView === 'playlist') {
+                } else if (currentView === 'playlist') {
 
-            } else {
-                appendGameSearchResults()
-            }
-        })
+                } else {
+                    appendGameSearchResults()
+                }
+            })
     }
 
     // request for rating a game
-    function handleRateGame(event){
+    function handleRateGame(event) {
         let gameID = event.target.id
         let game = searchResults.find(game => game.id == gameID)
         let rating = document.querySelector('#rate' + gameID).value
@@ -324,25 +303,99 @@
                 'Content-type': 'application/json; charset=UTF-8',
             }
         })
-        .then(res => res.json())
-        .then(data => {
-            games = data.games
-            console.log(data)
-            // displayCompletedList() need to create this function
-        })
+            .then(res => res.json())
+            .then(data => {
+                games = data.games
+                console.log(data)
+                // displayCompletedList() need to create this function
+            })
     }
 
     document.addEventListener('click', (e) => {
         let attribute = e.target.attributes.buttonFunc
-        if(attribute && attribute.value === 'handlePlaylist'){
+        if (attribute && attribute.value === 'handlePlaylist') {
             let url = '/.netlify/functions/handlePlaylist'
             handleListUpdate(e, 'onPlaylist', url)
-        } else if(attribute && attribute.value === 'handleComplete'){
+        } else if (attribute && attribute.value === 'handleComplete') {
             let url = '/.netlify/functions/handleComplete'
             handleListUpdate(e, 'onComplete', url)
-        } else if(attribute && attribute.value === 'rateGame'){
+        } else if (attribute && attribute.value === 'rateGame') {
             handleRateGame(e)
         }
     })
+
+    async function mapSearchResultsToCardObj(game) {
+        
+        // find esrb rating
+        let esrbRating = ''
+        if (game.age_ratings) {
+            game.age_ratings.forEach(el => {
+                if (ratings.hasOwnProperty(el.rating)) {
+                    return esrbRating = ratings[el.rating]
+                }
+            })
+        }
+
+        // get involved companies
+        let companies = []
+        if (game.involved_companies) {
+            game.involved_companies.forEach(el => {
+                if (el.company.name) {
+                    companies.push(el.company.name)
+                }
+            })
+        }
+
+        // get genre(s)
+        let genres = []
+        if (game.genres) {
+            game.genres.forEach(genre => {
+                genres.push(genre.name)
+            })
+        }
+
+        // get wikia link
+        let wikia = ''
+        if (game.websites) {
+            game.websites.forEach(website => {
+                if (website.category == 2) {
+                    wikia = website.url
+                }
+            })
+        }
+
+        // get bigger cover
+        if (game.cover) {
+            getBiggerImageURL(game, game.cover.url)
+        }
+
+        // null collection name if it doesn't exist
+        let collection
+        if (!game.collection) {
+            collection = null
+        } else {
+            collection = game.collection.name
+        }
+
+        // create date from unix timestamp
+        let date = new Date(game.first_release_date * 1000).toLocaleDateString("en-US")
+
+        // I debated normalizing this data on the lambda function to take load off the client, but decided to keep it here for now.
+        // Either way not a large hit to performance on client from what I can tell.
+        return game = {
+            aggregatedRating: game.aggregated_rating,
+            companies: companies,
+            cover: game.cover.url,
+            releaseDate: date,
+            esrbRating: esrbRating,
+            gameCollection: collection,
+            genre: genres,
+            wikia: wikia,
+            id: game.id,
+            name: game.name,
+            summary: game.summary,
+            userRating: ''
+        }
+    }
 
 })(window)

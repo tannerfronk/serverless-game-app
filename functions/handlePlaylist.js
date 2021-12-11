@@ -33,16 +33,16 @@ exports.handler = async function (event, context) {
         if(!gameExists){
             const newGame = new Game({
                 id: gameBody.id,
-                cover: gameBody.cover.url,
+                cover: gameBody.cover,
                 name: gameBody.name,
                 companies: gameBody.companies,
                 summary: gameBody.summary,
-                first_release_date: gameBody.first_release_date,
-                esrbRating: gameBody.esrb_rating,
-                gameCollection: gameBody.collection.name,
-                genre: gameBody.genres,
+                releaseDate: gameBody.releaseDate,
+                esrbRating: gameBody.esrbRating,
+                gameCollection: gameBody.gameCollection,
+                genre: gameBody.genre,
                 wikia: gameBody.wikia,
-                aggregatedRating: gameBody.aggregated_rating,
+                aggregatedRating: gameBody.aggregatedRating,
                 onPlaylist: true,
                 completed: false,
                 userRating: ''

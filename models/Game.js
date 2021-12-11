@@ -6,7 +6,7 @@ const Game = new Schema({
     name: String,
     companies: Array,
     summary: String,
-    first_release_date: String,
+    releaseDate: String,
     esrbRating: String,
     gameCollection: String,
     genre: Array,
