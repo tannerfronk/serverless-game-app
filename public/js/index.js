@@ -12,6 +12,7 @@
     let currentView = 'search' // initialize current view for rendering 
     let playlistViewBtn = document.querySelector('#playlistView')
     let completedListViewBtn = document.querySelector('#completedView')
+    let characterViewBtn = document.querySelector('#characterView')
 
     // event listener for search type toggle
     searchTypeBtn.addEventListener('click', () => {
@@ -33,6 +34,10 @@
         currentView = 'completed'
         getGamesFromDB('/.netlify/functions/getCompletedGames')
     })
+    characterViewBtn.addEventListener('click', () => {
+        currentView = 'character'
+        getCharactersFromDB()
+    })
 
     function getGamesFromDB(url){
         searchField.value = ''
@@ -42,6 +47,17 @@
             console.log(data)
             searchResults = data.games
             appendGameSearchResults()
+        })
+    }
+
+    function getCharactersFromDB(){
+        searchField.value = ''
+        fetch('/.netlify/functions/getFavoriteCharacters')
+        .then(res => res.json())
+        .then(data => {
+            console.log(data)
+            searchResults = data.characters
+            appendCharacterSearchResults()
         })
     }
 
@@ -213,8 +229,12 @@
     // character result card
     function appendCharacterSearchResults() {
 
-        resultsNum = `Results Found: ${searchResults.length}`
-        resultsNumDiv.innerHTML = resultsNum
+        if(currentView === 'search'){
+            resultsNumDiv.innerHTML = `Results Found: ${searchResults.length}`
+        } else if(currentView === 'character'){
+            resultsNumDiv.innerHTML = `Favorite Characters: ${searchResults.length}`
+        }
+
         searchResultsDiv.innerHTML = ''
         searchResults.forEach((character) => {
 

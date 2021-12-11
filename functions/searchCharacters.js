@@ -32,6 +32,8 @@ exports.handler = async function (event, context) {
                 // get bigger cover
                 if (character.mug_shot) {
                     getBiggerImageURL(character, character.mug_shot.url)
+                } else {
+                    character.mug_shot = { url: '' } // add url key to character.mug_shot if it doesn't exist.
                 }
 
                 // get all games to one array

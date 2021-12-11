@@ -98,7 +98,7 @@ exports.handler = async function (event, context) {
                     date = new Date(game.first_release_date * 1000).toLocaleDateString("en-US")
                 }
 
-                if(!game.aggregatedRating){
+                if(!game.aggregated_rating){
                     game.aggregated_rating = 0
                 }
         
