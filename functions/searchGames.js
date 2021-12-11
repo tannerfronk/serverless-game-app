@@ -16,15 +16,11 @@ exports.handler = async function (event, context) {
         11: 'M'
     }
 
-    function getBiggerImageURL(obj, url, type) {
+    function getBiggerImageURL(obj, url) {
         let imageURL = url.split('/')
         imageURL[6] = 't_cover_big'
         imageURL = imageURL.join('/')
-        if (type === 'character') {
-            obj.mug_shot.url = imageURL
-        } else {
-            obj.cover.url = imageURL
-        }
+        obj.cover.url = imageURL
 
         return obj
     }
@@ -84,6 +80,8 @@ exports.handler = async function (event, context) {
                 // get bigger cover
                 if (game.cover) {
                     getBiggerImageURL(game, game.cover.url)
+                } else {
+                    game.cover = { url: '' } // add url key to game.cover if it doesn't exist.
                 }
         
                 // null collection name if it doesn't exist

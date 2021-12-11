@@ -138,7 +138,7 @@
                         `<p class="text-white mt-4 position-absolute top-0 start-50 translate-middle">You rated this game ${game.userRating} out of 10</p>`
                         : ''
                     }
-                    <img src="${game.cover === undefined ? 'https://via.placeholder.com/300?text=No+Image+Found' : game.cover}" class="card-img-top my-1 w-25" alt="${game.name} cover">
+                    <img src="${game.cover === undefined || game.cover === '' ? 'https://via.placeholder.com/300?text=No+Image+Found' : game.cover}" class="card-img-top my-1 w-25" alt="${game.name} cover">
                     
                         <div class="d-flex flex-column float-end w-25">
                             <button id="${game.id}" buttonFunc="handlePlaylist" class="btn btn-secondary float-end mb-2">${game.onPlaylist ? 'On List <i class="fas fa-check"></i>' : 'Add to My List'}</button>
@@ -220,23 +220,20 @@
             let games = []
             character.games.forEach((game) => games.push(game.name))
 
-            // get bigger cover
-            if (character.mug_shot) {
-                getBiggerImageURL(character, character.mug_shot.url, type = 'character')
-            }
-
             searchResultsDiv.innerHTML +=
                 `
                 <div class="card my-2">
-                    <div class="card-body">
+                    <div class="card-body bg-dark">
                     <img src="${character.mug_shot === undefined ? 'https://via.placeholder.com/300?text=No+Image+Found' : character.mug_shot.url}" class="card-img-top my-1 w-25" alt="${character.name} mug shot">
                         <div class="d-flex flex-column float-end w-25">
                             <button id="${character.id}" buttonFunc="" class="btn btn-secondary float-end mb-2">Add to Favorites</button>
                         </div>
-                        <h5 class="card-title mt-1">${character.name}</h5>
-                        <h6 class="card-subtitle my-3 text-muted">Appears in: ${games.join(',   ')}</h6>
+                        <h5 class="card-title mt-1 text-white">${character.name}</h5>
+                        <div class="d-flex justify-content-between my-3">
+                            <h6 class="card-subtitle text-white">Appears in: ${games.join(',   ')}</h6>
+                            <h6 class="card-subtitle text-white">AKA: ${character.akas ? character.akas.join(', ') : 'N/A'}</h6>
+                        </div>
                         <h6 class="card-subtitle mb-2 text-muted">${character.description ?? 'No Description Available'}</h6>
-                        <p class="card-text">AKA: ${character.akas ? character.akas.join(', ') : 'N/A'}</p>
                     </div>
                 </div>
             `
