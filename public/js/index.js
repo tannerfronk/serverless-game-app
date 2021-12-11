@@ -198,7 +198,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                ${game.completed || game.onPlaylist ?
+                                ${game.completed ?
                                     `<button id="${game.id}" type="button" class="btn btn-primary" buttonFunc="rateGame" data-bs-dismiss="modal">Save Rating</button>`
                                     : ''
                                 }

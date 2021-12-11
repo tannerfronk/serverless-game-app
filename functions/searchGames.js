@@ -99,6 +99,10 @@ exports.handler = async function (event, context) {
                 if(!isNaN(game.first_release_date)){
                     date = new Date(game.first_release_date * 1000).toLocaleDateString("en-US")
                 }
+
+                if(!game.aggregatedRating){
+                    game.aggregated_rating = 0
+                }
         
                 game = {
                     aggregatedRating: game.aggregated_rating,
