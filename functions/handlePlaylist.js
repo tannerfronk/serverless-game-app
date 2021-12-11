@@ -60,7 +60,7 @@ exports.handler = async function (event, context) {
             return {
                 statusCode: 200,
                 body: JSON.stringify({
-                    message: 'game was added to playlist',
+                    message: `${newGame.name} was added to playlist`,
                     games: allGames
                 })
             }
@@ -73,6 +73,7 @@ exports.handler = async function (event, context) {
             }
 
             let result = await gameExists.save()
+            allGames = await Game.find()
 
             return {
                 statusCode: 200,

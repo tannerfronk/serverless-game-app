@@ -69,8 +69,7 @@ exports.handler = async function (event, context) {
             gameExists.completed = !gameExists.completed
 
             let result = await gameExists.save()
-
-            console.log(`${gameExists.completed ? `${gameExists.name} is now marked as complete` : `${gameExists.name} has been removed from completed list`}`)
+            allGames = await Game.find()
 
             return {
                 statusCode: 200,

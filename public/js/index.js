@@ -107,7 +107,7 @@
         resultsNum = `Results Found: ${searchResults.length}`
         resultsNumDiv.innerHTML = resultsNum
         searchResultsDiv.innerHTML = ''
-        searchResults.forEach(async (game, index) => {
+        searchResults.forEach(game => {
 
             searchResultsDiv.innerHTML +=
                 `
@@ -246,7 +246,6 @@
             .then(res => res.json())
             .then(data => {
                 games = data.games
-                console.log(games)
 
                 if (currentView === 'completed') {
 
