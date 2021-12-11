@@ -9,14 +9,6 @@
     let resultsNumDiv = document.querySelector('#resultsNum')
     let searchType = 'Games' // games is the default search
     let searchTypeBtn = document.querySelector('#searchType')
-    let ratings = {
-        6: 'RP',
-        7: 'EC',
-        8: 'E',
-        9: 'E10',
-        10: 'T',
-        11: 'M'
-    }
     let loadingSpinner = document.querySelector('#loadingSpinner')
     let games
     let currentView = 'search' // initialize current view for rendering 
@@ -109,20 +101,6 @@
         }
     })
 
-    // general function for getting bigger image 
-    function getBiggerImageURL(obj, url, type) {
-        let imageURL = url.split('/')
-        imageURL[6] = 't_cover_big'
-        imageURL = imageURL.join('/')
-        if (type === 'character') {
-            obj.mug_shot.url = imageURL
-        } else {
-            obj.cover.url = imageURL
-        }
-
-        return obj
-    }
-
     // game result card
     function appendGameSearchResults() {
 
@@ -130,11 +108,6 @@
         resultsNumDiv.innerHTML = resultsNum
         searchResultsDiv.innerHTML = ''
         searchResults.forEach(async (game, index) => {
-
-            if (currentView === 'search') {
-                game = await mapSearchResultsToCardObj(game)
-                searchResults[index] = game
-            }
 
             searchResultsDiv.innerHTML +=
                 `
@@ -163,8 +136,8 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                ${game.collection ?
-                                    `<p class="card-subtitle mb-3">Belongs to the <b>${game.collection}</b> series</p>`
+                                ${game.gameCollection ?
+                                    `<p class="card-subtitle mb-3">Belongs to the <b>${game.gameCollection}</b> series</p>`
                                     : ''
                                 }
                                 ${game.genre ?
@@ -209,7 +182,6 @@
                     </div>
             `
         })
-        console.log(searchResults)
     }
 
     // character result card
@@ -323,79 +295,5 @@
             handleRateGame(e)
         }
     })
-
-    async function mapSearchResultsToCardObj(game) {
-        
-        // find esrb rating
-        let esrbRating = ''
-        if (game.age_ratings) {
-            game.age_ratings.forEach(el => {
-                if (ratings.hasOwnProperty(el.rating)) {
-                    return esrbRating = ratings[el.rating]
-                }
-            })
-        }
-
-        // get involved companies
-        let companies = []
-        if (game.involved_companies) {
-            game.involved_companies.forEach(el => {
-                if (el.company.name) {
-                    companies.push(el.company.name)
-                }
-            })
-        }
-
-        // get genre(s)
-        let genres = []
-        if (game.genres) {
-            game.genres.forEach(genre => {
-                genres.push(genre.name)
-            })
-        }
-
-        // get wikia link
-        let wikia = ''
-        if (game.websites) {
-            game.websites.forEach(website => {
-                if (website.category == 2) {
-                    wikia = website.url
-                }
-            })
-        }
-
-        // get bigger cover
-        if (game.cover) {
-            getBiggerImageURL(game, game.cover.url)
-        }
-
-        // null collection name if it doesn't exist
-        let collection
-        if (!game.collection) {
-            collection = null
-        } else {
-            collection = game.collection.name
-        }
-
-        // create date from unix timestamp
-        let date = new Date(game.first_release_date * 1000).toLocaleDateString("en-US")
-
-        // I debated normalizing this data on the lambda function to take load off the client, but decided to keep it here for now.
-        // Either way not a large hit to performance on client from what I can tell.
-        return game = {
-            aggregatedRating: game.aggregated_rating,
-            companies: companies,
-            cover: game.cover.url,
-            releaseDate: date,
-            esrbRating: esrbRating,
-            gameCollection: collection,
-            genre: genres,
-            wikia: wikia,
-            id: game.id,
-            name: game.name,
-            summary: game.summary,
-            userRating: ''
-        }
-    }
 
 })(window)
