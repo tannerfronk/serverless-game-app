@@ -35,6 +35,7 @@
     })
 
     function getGamesFromDB(url){
+        searchField.value = ''
         fetch(url)
         .then(res => res.json())
         .then(data => {
@@ -148,7 +149,7 @@
                         <h6 class="card-subtitle text-white mt-2">Developed by: ${game.companies.join(', ')}</h6>
                         <h6 class="card-subtitle my-3 text-muted">${game.summary ?? 'No Description Available'}</h6>
                         <div class="d-flex justify-content-between">
-                            <p class="card-text text-white">First published: ${game.releaseDate ? game.releaseDate : 'Unknown'}</p>
+                            <p class="card-text text-white">First published: ${game.releaseDate ? game.releaseDate : 'No Date Available'}</p>
                             <p class="card-text text-white text-end">${game.esrbRating !== '' ? 'ESRB Rating: ' + game.esrbRating : "No ESRB Rating Available"}</p>
                         </div>
                     </div>

@@ -95,7 +95,10 @@ exports.handler = async function (event, context) {
                 }
         
                 // create date from unix timestamp
-                let date = new Date(game.first_release_date * 1000).toLocaleDateString("en-US")
+                let date
+                if(!isNaN(game.first_release_date)){
+                    date = new Date(game.first_release_date * 1000).toLocaleDateString("en-US")
+                }
         
                 game = {
                     aggregatedRating: game.aggregated_rating,
