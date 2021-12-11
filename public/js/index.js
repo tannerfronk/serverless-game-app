@@ -9,7 +9,6 @@
     let searchType = 'Games' // games is the default search
     let searchTypeBtn = document.querySelector('#searchType')
     let loadingSpinner = document.querySelector('#loadingSpinner')
-    let games
     let currentView = 'search' // initialize current view for rendering 
     let playlistViewBtn = document.querySelector('#playlistView')
     let completedListViewBtn = document.querySelector('#completedView')
@@ -28,7 +27,7 @@
     // event listener for view changing buttons and receiving games from DB
     playlistViewBtn.addEventListener('click', () => {
         currentView = 'playlist'
-        // getGamesFromDB('/.netlify/functions/getCompletedGames')
+        getGamesFromDB('/.netlify/functions/getGamesOnPlaylist')
     })
     completedListViewBtn.addEventListener('click', () => {
         currentView = 'completed'
@@ -134,7 +133,12 @@
                 `
                 <div class="card bg-dark my-2">
                     <div class="card-body">
+                    ${game.userRating != '' ? 
+                        `<p class="text-white mt-4 position-absolute top-0 start-50 translate-middle">You rated this game ${game.userRating} out of 10</p>`
+                        : ''
+                    }
                     <img src="${game.cover === undefined ? 'https://via.placeholder.com/300?text=No+Image+Found' : game.cover}" class="card-img-top my-1 w-25" alt="${game.name} cover">
+                    
                         <div class="d-flex flex-column float-end w-25">
                             <button id="${game.id}" buttonFunc="handlePlaylist" class="btn btn-secondary float-end mb-2">${game.onPlaylist ? 'On List <i class="fas fa-check"></i>' : 'Add to My List'}</button>
                             <button id="${game.id}" buttonFunc="handleComplete" class="btn btn-secondary float-end mb-2">${game.completed ? 'Completed <i class="fas fa-check"></i>' : 'I Have Played This'}</button>
@@ -173,8 +177,8 @@
                                     `<p class="mt-3 text-white">Average User Rating: ${game.aggregatedRating.toFixed(2)}</a></p>`
                                     : ''
                                 }
-                                ${game.completed || game.onPlaylist ?
-                                    `<p class="text-white">How would you rate ${game.name} out of 10 stars?</p>
+                                ${game.completed ?
+                                    `<p class="text-white">${game.userRating ? 'Do you want to change your rating out of 10?' : `How would you rate ${game.name} out of 10 stars?`}</p>
                                                 <select class="bg-dark text-white" id="rate${game.id}">
                                                     <option value="1">1</option>
                                                     <option value="2">2</option>
@@ -239,7 +243,7 @@
     }
 
     // handle add to list or remove from playlist or completed list
-    function handleListUpdate(event, type, url) {
+    function handleGameListUpdate(event, type, url) {
         let gameID = event.target.id
         let game = searchResults.find(game => game.id == gameID)
 
@@ -266,15 +270,7 @@
         })
             .then(res => res.json())
             .then(data => {
-                games = data.games
-
-                if (currentView === 'completed') {
-
-                } else if (currentView === 'playlist') {
-
-                } else {
-                    appendGameSearchResults()
-                }
+                appendGameSearchResults()
             })
     }
 
@@ -294,9 +290,8 @@
         })
             .then(res => res.json())
             .then(data => {
-                games = data.games
-                console.log(data)
-                // displayCompletedList() need to create this function
+                getGamesFromDB('/.netlify/functions/getCompletedGames')
+                appendGameSearchResults()
             })
     }
 
@@ -304,10 +299,10 @@
         let attribute = e.target.attributes.buttonFunc
         if (attribute && attribute.value === 'handlePlaylist') {
             let url = '/.netlify/functions/handlePlaylist'
-            handleListUpdate(e, 'onPlaylist', url)
+            handleGameListUpdate(e, 'onPlaylist', url)
         } else if (attribute && attribute.value === 'handleComplete') {
             let url = '/.netlify/functions/handleComplete'
-            handleListUpdate(e, 'onComplete', url)
+            handleGameListUpdate(e, 'onComplete', url)
         } else if (attribute && attribute.value === 'rateGame') {
             handleRateGame(e)
         }
