@@ -14,4 +14,4 @@ For completed games, you can rate them through the modal. Your rating will be re
 
 You can add characters to a favorite list, and view them on the Favorite Characters page.
 
-#NOTE - the netlify functions speed vary. It may take a second or two for the screen to change depending on your action.
+# NOTE - the netlify functions speed vary. It may take a second or two for the screen to change depending on your action.
