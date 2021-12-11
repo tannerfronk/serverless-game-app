@@ -15,7 +15,6 @@ exports.handler = async function (event, context) {
     game.userRating = gameBody.userRating
     let result = await game.save()
         .then(doc => {
-            console.log(doc)
             console.log(`Rated ${game.name} ${game.userRating} out of 10`)
         })
         .then(async () => {

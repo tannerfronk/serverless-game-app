@@ -42,7 +42,7 @@ exports.handler = async function (event, context) {
                 gameCollection: gameBody.gameCollection,
                 genre: gameBody.genre,
                 wikia: gameBody.wikia,
-                aggregatedRating: gameBody.aggregatedRating,
+                aggregatedRating: parseFloat(gameBody.aggregatedRating),
                 onPlaylist: false,
                 completed: true,
                 userRating: ''

@@ -11,7 +11,7 @@ const Game = new Schema({
     gameCollection: String,
     genre: Array,
     wikia: String,
-    aggregatedRating: String,
+    aggregatedRating: Number,
     onPlaylist: Boolean,
     completed: Boolean,
     userRating: String,

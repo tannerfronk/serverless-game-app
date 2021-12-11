@@ -25,15 +25,25 @@
         searchField.placeholder = `Search for ${searchType}!`
     })
 
-    // event listener for view changing buttons
+    // event listener for view changing buttons and receiving games from DB
     playlistViewBtn.addEventListener('click', () => {
         currentView = 'playlist'
-        resultsNumDiv.innerHTML = `Games on Your List: ${searchResults.length}`
+        // getGamesFromDB('/.netlify/functions/getCompletedGames')
     })
     completedListViewBtn.addEventListener('click', () => {
         currentView = 'completed'
-        resultsNumDiv.innerHTML = `Games you have completed: ${searchResults.length}`
+        getGamesFromDB('/.netlify/functions/getCompletedGames')
     })
+
+    function getGamesFromDB(url){
+        fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            console.log(data)
+            searchResults = data.games
+            appendGameSearchResults()
+        })
+    }
 
     // call function to generate access token for IGDB
     function generateAccessToken() {
@@ -109,8 +119,14 @@
     // game result card
     function appendGameSearchResults() {
 
-        resultsNum = `Results Found: ${searchResults.length}`
-        resultsNumDiv.innerHTML = resultsNum
+        if(currentView === 'search'){
+            resultsNumDiv.innerHTML = `Results Found: ${searchResults.length}`
+        } else if(currentView === 'completed'){
+            resultsNumDiv.innerHTML = `Games you have completed: ${searchResults.length}`
+        } else if(currentView === 'playlist'){
+            resultsNumDiv.innerHTML = `Games on Your List: ${searchResults.length}`
+        }
+        
         searchResultsDiv.innerHTML = ''
         searchResults.forEach(game => {
 
@@ -138,7 +154,7 @@
                             <div class="modal-content bg-dark">
                             <div class="modal-header">
                                 <h5 class="modal-title text-white">${game.name}</h5>
-                                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 ${game.gameCollection ?
@@ -159,7 +175,7 @@
                                 }
                                 ${game.completed || game.onPlaylist ?
                                     `<p class="text-white">How would you rate ${game.name} out of 10 stars?</p>
-                                                <select id="rate${game.id}">
+                                                <select class="bg-dark text-white" id="rate${game.id}">
                                                     <option value="1">1</option>
                                                     <option value="2">2</option>
                                                     <option value="3">3</option>
@@ -268,9 +284,6 @@
         let game = searchResults.find(game => game.id == gameID)
         let rating = document.querySelector('#rate' + gameID).value
         game.userRating = rating
-        console.log(gameID)
-        console.log('#rate' + gameID)
-        console.log(rating)
 
         fetch('/.netlify/functions/rateGame', {
             method: 'PUT',
